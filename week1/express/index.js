@@ -21,6 +21,20 @@ app.get('/', (req, res) => {
     res.send('<h1>Hello, world</h1>');
 })
 
+
+app.get('/something:id', (req, res, next) => {
+    console.log('Function 1');
+    // res.send(`${parseInt(req.params['id']) + 1}`)
+    next('/');
+})
+
+// app.get('/something', (req, res, next) => {
+//     console.log('Function 2');
+//     res.send('Something2')
+//     next();
+// });
+
+
 app.listen(PORT, () => {
     console.log(`App listening on ${PORT}`);
 });
