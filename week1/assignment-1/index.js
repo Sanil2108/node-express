@@ -1,9 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const dishRouter = require('./routes/dish-router');
-const leaderRouter = require('./routes/leader-router');
-const promoRouter = require('./routes/promo-router');
+const dishRouter = require('./routes/dishRouter');
+const leaderRouter = require('./routes/leaderRouter');
+const promoRouter = require('./routes/promoRouter');
 
 app = express();
 
