@@ -9,6 +9,10 @@ const promotionsSchema = new Schema({
         required: true,
         unique: true,
     },
+    description: {
+        type: String,
+        required: true,
+    },
     image: {
         type: String,
         required: true,
@@ -22,15 +26,11 @@ const promotionsSchema = new Schema({
         required: true,
         min: 0,
     },
-    description: {
-        type: String,
-        required: true,
-    },
     featured: {
         type: Boolean,
-        required: true,
+        default: false,
     }
-});
+}, { timestamps: true });
 
 const promotionsModel = mongoose.model('Promotion', promotionsSchema);
 module.exports = promotionsModel;

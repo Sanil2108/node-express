@@ -25,9 +25,9 @@ const leadersSchema = new Schema({
     },
     featured: {
         type: Boolean,
-        required: true,
+        default: false,
     }
-});
+}, { timestamps: true });
 
 const leadersModel = mongoose.model('Leader', leadersSchema);
 module.exports = leadersModel;
