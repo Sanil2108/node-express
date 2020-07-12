@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const passport = require('passport');
+
 const User = require('../models/user');
 
 const router = express.Router();
@@ -12,65 +14,26 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/signup', (req, res, next) => {
-    // User.findOne({username: req.body.username})
-    // .then((user) => {
-    //     if (user) {
-    //         next(new Error('User with this username already exists'))
-    //     }
-    //     else {
-    //         return User.create({
-    //             username: req.body.username,
-    //             password: req.body.password,
-    //         }).then((user) => {
-    //             res.statusCode = 200;
-    //             res.setHeader('Content-type', 'application/json');
-    //             res.send();
-    //         })
-    //     }
-    // })
-    // .catch((err) => next(err))
-});
-
-router.post('/login', (req, res, next) => {
-    if (!req.session.user) {
-        const authHeader = req.headers['authorization'];
-        if (!authHeader) {
-            const err = new Error('You are not authenticated');
-            res.setHeader('WWW-Authenticate', 'Basic');
-            err.status = 401;
-            return next(err);
-        }
-
-        const [userName, password] =
-            new Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-
-        if (userName === 'sanil' && password === 'root') {
-            req.session.user = 'authenticated';
-            res.status(200).end();
+    User.register(new User({username: req.body.username}), req.body.password, (err, user) =>
+    {
+        if (err) {
+            res.statusCode = 500;
+            res.json({err});
         }
         else {
-            const err = new Error('You are not authenticated');
-            res.setHeader('WWW-Authenticate', 'Basic');
-            err.status = 401;
-            return next(err);
+            passport.authenticate('local')(req, res, () => {
+                res.statusCode = 200;
+                res.setHeader('Content-type', 'application/json');
+                res.send('Registration successful');
+            });
         }
-        
-        // User.findOne({username: userName}).then((user) => {
-        //     if (user.password === password) {
-        //         req.session.user = 'authenticated';
-        //     }
-        //     else {
-        //         const err = new Error('You are not authenticated');
-        //         res.setHeader('WWW-Authenticate', 'Basic');
-        //         err.status = 401;
-        //         return next(err);
-        //     }
-        // });
-    }
-    else {
-        res.setHeader('Content-Type', 'text/plain');
-        res.status(200).end('You are already authenticated')
-    }
+    })
+});
+
+router.post('/login', passport.authenticate('local'), (req, res, next) => {
+    res.statusCode = 200;
+    res.setHeader('Content-type', 'application/json');
+    res.send('login successful');
 });
 
 router.get('/logout', (req, res) => {

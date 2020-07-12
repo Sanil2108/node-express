@@ -12,14 +12,17 @@ const dishRouter = require('./routes/dish-router');
 const leaderRouter = require('./routes/leader-router');
 const promoRouter = require('./routes/promo-router');
 
+const passport = require('passport');
+const authenticate = require('./authenticate');
+
 const mongoose = require('mongoose');
 
-// const url = 'mongodb://localhost';
-// const connect = mongoose.connect(url);
+const url = 'mongodb://localhost:27017/confusionServer';
+const connect = mongoose.connect(url);
 
-// connect.then((db) => {
-//     console.log('Connected to the db');
-// }, (err) => console.log(err));
+connect.then((db) => {
+    console.log('Connected to the db');
+}, (err) => console.log(err));
 
 var app = express();
 
@@ -39,49 +42,22 @@ app.use(session({
     store: new FileStore(),
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/users', usersRouter);
 
 // This is the auth middleware
 function auth(req, res, next) {
-    // console.log(req.signedCookies);
-    console.log(req.session);
-
-    // If there is no signed cookie, then authorize using the auth header
-    // if (!req.signedCookies.user) {
-    // Using session
-    if (!req.session.user) {
+    if (!req.user) {
         const err = new Error('You are not authenticated');
         res.setHeader('WWW-Authenticate', 'Basic');
         err.status = 401;
         return next(err);
     }
     else {
-        // Using cookies
-        // if (req.signedCookies.user === 'sanil') {
-        // Using sessions
-        if (req.session.user === 'authenticated') {
-            next();
-        }
-        else {
-            const err = new Error('You are not authenticated');
-            res.setHeader('WWW-Authenticate', 'Basic');
-            err.status = 401;
-            return next(err);
-        }
+        next();
     }
-
-    // Using basic authentication
-    // const authHeader = req.headers['Authorization'];
-    // if (!authHeader) {
-    //     const err = new Error('You are not authenticated');
-    //     res.setHeader('WWW-Authenticate', 'Basic');
-    //     err.status = 401;
-    //     return next(err);
-    // }
-
-    // const [userName, password] =
-    //     new Buffer(authHeader.split(' ')[1], 'base64').toString().split(':');
-    
 }
 
 app.use(auth);
